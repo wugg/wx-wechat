@@ -1,6 +1,6 @@
 wechat:
-  AppID:     wx7dc67faba9359f5e
-  AppSecret: 9c73b9258d648318c84f5e8ea0fc26b6
+  AppID:     
+  AppSecret: 
 redis:
   Addr:    127.0.0.1:6379
   Password:  # no password set
