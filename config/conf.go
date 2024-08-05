@@ -1,5 +1,7 @@
 package config
 
+import "github.com/go-redis/redis/v8"
+
 type Config struct {
 	AppID       string `json:"appid"`
 	AppSecret   string `json:"appsecret"`
@@ -7,8 +9,14 @@ type Config struct {
 }
 
 var Conf = Config{
-	AppID:     "wx7dc67faba9359f5e",
-	AppSecret: "9c73b9258d648318c84f5e8ea0fc26b6",
+	AppID:     "",
+	AppSecret: "",
+}
+
+var RedisConf = &redis.Options{
+	Addr:     "127.0.0.1:6379",
+	Password: "", // no password set
+	DB:       0,  // use default DB
 }
 
 const UPLOAD_MEDIA_URL = "http://file.api.weixin.qq.com/cgi-bin"

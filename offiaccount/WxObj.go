@@ -9,6 +9,7 @@ import (
 	"wechat/tool"
 )
 
+// 微信基础信息获取 access_token  jsticket
 type WxAccess struct {
 	AccessToken       string `json:"access_token"`
 	ExpiresIn         int    `json:"expires_in"`
@@ -49,6 +50,9 @@ func (j *JsTicket) isTicketExpired() bool {
 func (wx *WxAccess) GetAccessToken() (*WxAccess, error) {
 	ctx := context.Background()
 	config := &config2.Conf
+	if config.AppID == "" || config.AppSecret == "" {
+		return nil, fmt.Errorf("appid or appsecret is empty")
+	}
 	redisv := redisClient.Get(ctx, config.AppID+"_access_token").Val()
 	if redisv != "" {
 		err := json.Unmarshal([]byte(redisv), wx)

@@ -1,14 +1,12 @@
 package tool
 
-import "github.com/go-redis/redis/v8"
+import (
+	"github.com/go-redis/redis/v8"
+	config2 "wechat/config"
+)
 
-var RedisClient *redis.Client
-var redisConfig = &redis.Options{
-	Addr:     "127.0.0.1:6379",
-	Password: "", // no password set
-	DB:       0,  // use default DB
-}
+var RedisClient = &redis.Client{}
 
 func init() {
-	RedisClient = redis.NewClient(redisConfig)
+	RedisClient = redis.NewClient(config2.RedisConf)
 }
