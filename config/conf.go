@@ -1,22 +1,34 @@
 package config
 
-import "github.com/go-redis/redis/v8"
+import (
+	"encoding/json"
+	"github.com/go-redis/redis/v8"
+	"os"
+)
 
 type Config struct {
-	AppID       string `json:"appid"`
-	AppSecret   string `json:"appsecret"`
-	AccessToken string `json:"access_token"`
+	AppID     string `yaml:"appid"`
+	AppSecret string `yaml:"appsecret"`
+}
+type redisConf struct {
+	Addr     string `yaml:"addr"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
 }
 
-var Conf = Config{
-	AppID:     "wx7dc67faba9359f5e",
-	AppSecret: "9c73b9258d648318c84f5e8ea0fc26b6",
-}
+var yamlConf, _ = os.ReadFile("config.yaml")
+var Conf Config
+var RedisConf redis.Options
 
-var RedisConf = &redis.Options{
-	Addr:     "127.0.0.1:6379",
-	Password: "", // no password set
-	DB:       0,  // use default DB
+func init() {
+	err := json.Unmarshal(yamlConf, &Conf)
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(yamlConf, &RedisConf)
+	if err != nil {
+		panic(err)
+	}
 }
 
 const UPLOAD_MEDIA_URL = "http://file.api.weixin.qq.com/cgi-bin"
