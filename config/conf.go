@@ -9,8 +9,8 @@ type Config struct {
 }
 
 var Conf = Config{
-	AppID:     "",
-	AppSecret: "",
+	AppID:     "wx7dc67faba9359f5e",
+	AppSecret: "9c73b9258d648318c84f5e8ea0fc26b6",
 }
 
 var RedisConf = &redis.Options{
