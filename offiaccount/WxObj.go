@@ -26,9 +26,18 @@ var WxObj = &WxAccess{}
 var redisClient = tool.RedisClient
 
 func init() {
-	WxObj, _ := WxObj.GetAccessToken()
+	WxObj, err := WxObj.GetAccessToken()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	AccessToken = WxObj.AccessToken
-	ticket, _ := (&JsTicket{}).GetJsTicket()
+	ticket, err := (&JsTicket{}).GetJsTicket()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	WxObj.Ticket = ticket.Ticket
 }
 func (wx *WxAccess) isAccessExpired() bool {
@@ -97,6 +106,9 @@ func (j *JsTicket) GetJsTicket() (*JsTicket, error) {
 		if !jsTicket.isTicketExpired() {
 			return jsTicket, nil
 		}
+	}
+	if AccessToken == "" {
+		return nil, fmt.Errorf("access_token is empty")
 	}
 	apiUrl := config2.API_URL_PREFIX + config2.GET_TICKET_URL + "access_token=" + AccessToken + "&type=jsapi"
 	body, err := tool.HttpGet(apiUrl)
