@@ -1,9 +1,8 @@
 package config
 
 import (
-	"encoding/json"
 	"github.com/go-redis/redis/v8"
-	"os"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -16,19 +15,31 @@ type redisConf struct {
 	DB       int    `yaml:"db"`
 }
 
-var yamlConf, _ = os.ReadFile("config.yaml")
 var Conf Config
 var RedisConf redis.Options
 
+// 使用viper读取配置，替代原有的读取和解析YAML文件的逻辑
 func init() {
-	err := json.Unmarshal(yamlConf, &Conf)
+	viper.SetConfigType("yaml")    // 设置配置文件类型为yaml
+	viper.SetConfigName("confing") // 设置配置文件名称
+	viper.AddConfigPath("./")      // 添加配置文件搜索路径
+	err := viper.ReadInConfig()    // 读取配置文件
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(yamlConf, &RedisConf)
-	if err != nil {
-		panic(err)
+	// 检查必要的配置项是否为空
+	if viper.GetString("wechat.appid") == "" || viper.GetString("wechat.appsecret") == "" {
+		panic("配置文件中微信AppID或AppSecret为空")
 	}
+	if viper.GetString("redis.addr") == "" {
+		panic("配置文件中Redis地址为空")
+	}
+	// 成功读取配置后赋值给全局变量
+	Conf.AppID = viper.GetString("wechat.appid")
+	Conf.AppSecret = viper.GetString("wechat.appsecret")
+	RedisConf.Addr = viper.GetString("redis.addr")
+	RedisConf.Password = viper.GetString("redis.password")
+	RedisConf.DB = viper.GetInt("redis.db")
 }
 
 const UPLOAD_MEDIA_URL = "http://file.api.weixin.qq.com/cgi-bin"
