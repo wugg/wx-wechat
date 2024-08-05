@@ -14,10 +14,14 @@
 3.  xxxx
 
 #### 使用说明
-tool 封装函数
-confing  微信配置数据
-offiaccount  微信公众号功能 1 微信授权 2微信业务授权配置  3公众号菜单管理 
-cofing.yaml  配置文件  
+
+- tool 封装函数
+- confing  微信配置数据
+- offiaccount  微信公众号功能 1 微信授权 2微信业务授权配置  3公众号菜单管理 
+- cofing.yaml  配置文件  
+- 
+
+```
         wechat:
           AppID:     
           AppSecret: 
@@ -25,6 +29,8 @@ cofing.yaml  配置文件
           Addr:    127.0.0.1:6379
           Password:  # no password set
           DB:       0  # use default DB
+```
+
 
 #### 参与贡献
 
