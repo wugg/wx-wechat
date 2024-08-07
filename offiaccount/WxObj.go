@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"time"
 	config2 "wechat/config"
 	"wechat/tool"
@@ -23,9 +24,16 @@ type WxAccess struct {
 
 var AccessToken string
 var WxObj = &WxAccess{}
-var redisClient = tool.RedisClient
+var redisClient *redis.Client
+var configIni *config2.Config
 
-func init() {
+func Instace(conf config2.Config, redisCon redis.Options) {
+	configIni = &conf
+	tool.CacheObj.Init(redisCon)
+	redisClient = tool.RedisClient
+	WxObj.init()
+}
+func (wx *WxAccess) init() {
 	WxObj, err := WxObj.GetAccessToken()
 	if err != nil {
 		fmt.Println(err)
@@ -40,6 +48,9 @@ func init() {
 	}
 	WxObj.Ticket = ticket.Ticket
 }
+
+// 判断access_token是否过期
+
 func (wx *WxAccess) isAccessExpired() bool {
 	return time.Now().Unix() > wx.AccessExpiresTime
 }
@@ -58,11 +69,10 @@ func (j *JsTicket) isTicketExpired() bool {
 
 func (wx *WxAccess) GetAccessToken() (*WxAccess, error) {
 	ctx := context.Background()
-	config := &config2.Conf
-	if config.AppID == "" || config.AppSecret == "" {
+	if configIni.AppID == "" || configIni.AppSecret == "" {
 		return nil, fmt.Errorf("appid or appsecret is empty")
 	}
-	redisv := redisClient.Get(ctx, config.AppID+"_access_token").Val()
+	redisv := redisClient.Get(ctx, configIni.AppID+"_access_token").Val()
 	if redisv != "" {
 		err := json.Unmarshal([]byte(redisv), wx)
 		if err != nil {
@@ -72,7 +82,7 @@ func (wx *WxAccess) GetAccessToken() (*WxAccess, error) {
 			return wx, nil
 		}
 	}
-	apiUrl := config2.API_URL_PREFIX + config2.AUTH_URL + "appid=" + config.AppID + "&secret=" + config.AppSecret
+	apiUrl := config2.API_URL_PREFIX + config2.AUTH_URL + "appid=" + configIni.AppID + "&secret=" + configIni.AppSecret
 	body, err := tool.HttpGet(apiUrl)
 	if err != nil {
 		return nil, err
@@ -88,7 +98,7 @@ func (wx *WxAccess) GetAccessToken() (*WxAccess, error) {
 	wxToken.AccessExpiresTime = time.Now().Unix() + int64(wxToken.ExpiresIn)
 	jsonwx, _ := json.Marshal(wxToken)
 	//redis 缓存access_token 7200s
-	biol := redisClient.Set(ctx, config.AppID+"_access_token", jsonwx, time.Duration(int64(wxToken.ExpiresIn))*time.Second)
+	biol := redisClient.Set(ctx, configIni.AppID+"_access_token", jsonwx, time.Duration(int64(wxToken.ExpiresIn))*time.Second)
 	if biol.Err() != nil {
 		return nil, biol.Err()
 	}
@@ -97,7 +107,7 @@ func (wx *WxAccess) GetAccessToken() (*WxAccess, error) {
 }
 func (j *JsTicket) GetJsTicket() (*JsTicket, error) {
 	jsTicket := &JsTicket{}
-	Ticket := redisClient.Get(context.Background(), config2.Conf.AppID+"_jsapi_ticket").Val()
+	Ticket := redisClient.Get(context.Background(), configIni.AppID+"_jsapi_ticket").Val()
 	if Ticket != "" {
 		err := json.Unmarshal([]byte(Ticket), jsTicket)
 		if err != nil {

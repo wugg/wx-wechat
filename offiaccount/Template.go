@@ -2,7 +2,7 @@ package offiaccount
 
 import (
 	"encoding/json"
-	"wechat/config"
+	config "wechat/config"
 	"wechat/tool"
 )
 

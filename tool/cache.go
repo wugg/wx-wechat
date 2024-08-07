@@ -2,11 +2,15 @@ package tool
 
 import (
 	"github.com/go-redis/redis/v8"
-	config2 "wechat/config"
 )
 
-var RedisClient = &redis.Client{}
+var RedisClient *redis.Client
 
-func init() {
-	RedisClient = redis.NewClient(&config2.RedisConf)
+type Cache struct {
+}
+
+var CacheObj = Cache{}
+
+func (c *Cache) Init(redisCon redis.Options) {
+	RedisClient = redis.NewClient(&redisCon)
 }

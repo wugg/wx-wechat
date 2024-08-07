@@ -11,7 +11,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -101,15 +100,4 @@ func MapToIoReader(data map[string]interface{}) io.Reader {
 	}
 	buffer := bytes.NewReader(Jsondata)
 	return buffer
-}
-
-func LoadYaml() ([]byte, error) {
-	yamlConfig, err := os.ReadFile("config.yaml")
-	if err != nil {
-		return nil, err
-	}
-	if len(yamlConfig) == 0 {
-		return nil, fmt.Errorf("配置文件内容为空")
-	}
-	return yamlConfig, nil
 }

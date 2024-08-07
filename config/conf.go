@@ -1,46 +1,11 @@
 package config
 
-import (
-	"github.com/go-redis/redis/v8"
-	"github.com/spf13/viper"
-)
-
 type Config struct {
 	AppID     string `yaml:"appid"`
 	AppSecret string `yaml:"appsecret"`
 }
-type redisConf struct {
-	Addr     string `yaml:"addr"`
-	Password string `yaml:"password"`
-	DB       int    `yaml:"db"`
-}
 
 var Conf Config
-var RedisConf redis.Options
-
-// 使用viper读取配置，替代原有的读取和解析YAML文件的逻辑
-func init() {
-	viper.SetConfigType("yaml")    // 设置配置文件类型为yaml
-	viper.SetConfigName("confing") // 设置配置文件名称
-	viper.AddConfigPath("./")      // 添加配置文件搜索路径
-	err := viper.ReadInConfig()    // 读取配置文件
-	if err != nil {
-		panic(err)
-	}
-	// 检查必要的配置项是否为空
-	if viper.GetString("wechat.appid") == "" || viper.GetString("wechat.appsecret") == "" {
-		panic("配置文件中微信AppID或AppSecret为空")
-	}
-	if viper.GetString("redis.addr") == "" {
-		panic("配置文件中Redis地址为空")
-	}
-	// 成功读取配置后赋值给全局变量
-	Conf.AppID = viper.GetString("wechat.appid")
-	Conf.AppSecret = viper.GetString("wechat.appsecret")
-	RedisConf.Addr = viper.GetString("redis.addr")
-	RedisConf.Password = viper.GetString("redis.password")
-	RedisConf.DB = viper.GetInt("redis.db")
-}
 
 const UPLOAD_MEDIA_URL = "http://file.api.weixin.qq.com/cgi-bin"
 const API_BASE_URL_PREFIX = "https://api.weixin.qq.com" //以下API接口URL需要使用此前缀
@@ -99,19 +64,25 @@ const GROUP_MEMBER_BATCHUPDATE_URL = "/groups/members/batchupdate?"
 const CUSTOM_SEND_URL = "/message/custom/send?"
 const MEDIA_UPLOADNEWS_URL = "/media/uploadnews?"
 const MASS_SEND_URL = "/message/mass/send?"
-const TEMPLATE_SET_INDUSTRY_URL = "/template/get_industry??"
-const TEMPLATE_ADD_TPL_URL = "/template/api_add_template?"
-const GET_All_PRIVATE_TEMPLATE_URL = "/template/get_all_private_template?"
-const DEL_PRIVATE_TEMPLATE_URL = "/template/del_private_template?"
-const TEMPLATE_SEND_URL = "/message/template/send?"
+const TEMPLATE_SET_INDUSTRY_URL = "/template/get_industry?"                //设置所属行业
+const TEMPLATE_ADD_TPL_URL = "/template/api_add_template?"                 // 添加模板
+const GET_All_PRIVATE_TEMPLATE_URL = "/template/get_all_private_template?" //获取模板ID
+const DEL_PRIVATE_TEMPLATE_URL = "/template/del_private_template?"         //删除模板
+const TEMPLATE_SEND_URL = "/message/template/send?"                        //发送模板消息
 const MASS_SEND_GROUP_URL = "/message/mass/sendall?"
 const MASS_DELETE_URL = "/message/mass/delete?"
 const MASS_PREVIEW_URL = "/message/mass/preview?"
 const MASS_QUERY_URL = "/message/mass/get?"
-const MEDIA_UPLOAD_URL = "/media/upload?"
-const MEDIA_GET_URL = "/media/get?"
-const MEDIA_VIDEO_UPLOAD = "/media/uploadvideo?"
-const OAUTH_AUTHORIZE_URL = "/authorize?"
+const MEDIA_UPLOAD_URL = "/media/upload?"          // 上传临时素材
+const MEDIA_GET_URL = "/media/get?"                //获取临时素材
+const MEDIA_VIDEO_UPLOAD = "/media/uploadvideo?"   //上传图文消息内的视频
+const MEDIA_IMG_UPLOAD = "/media/uploadimg?"       //上传图文消息内的图片获取URL
+const ADD_MATERIAL_URL = "/material/add_material?" //新增其他类型永久素材
+const MEDIA_GET_MATERIAL = "/material/get_material?"
+const MEDIA_DEL_MATERIAL = "/material/del_material?"
+const MEDIA_GET_MATERIAL_COUNT = "/material/get_materialcount?" // 获取素材总数
+const MEDIA_GET_MATERIAL_LIST = "/material/batchget_material?"  //获取素材列表
+const OAUTH_AUTHORIZE_URL = "/authorize?"                       //授权
 
 // /多客服相关地址
 const CUSTOM_SERVICE_GET_RECORD = "/customservice/getrecord?"
